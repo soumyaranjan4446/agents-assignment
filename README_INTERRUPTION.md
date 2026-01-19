@@ -34,28 +34,31 @@ export LIVEKIT_IGNORE_WORDS="yeah,yep,uh-huh,continue"
     *   **Match**: Log "Ignoring interruption" and do nothing.
     *   **No Match**: Trigger `interrupt()` (Stop audio, clear queue).
 
-## ✅ Verification
+## ✅ Verification & Proof
 
-You can verify the logic without running a full agent using the included test runner:
-
+### 1. Visual Demo (Simulation)
+Run the high-fidelity simulation to see the agent's decision-making in real-time (with typewriter effects and state visualization):
 ```bash
-python run_logic_test.py
+python demo_simulation.py
 ```
+*   **Scenario 1-6:** Standard Ignore/Interrupt cases.
+*   **Scenario 7:** **Critical "Silent State" Check** (Proves the agent correctly *responds* to "Yeah" when silent, instead of ignoring it).
 
-Expected Output:
-```
-Running Interruption Logic Tests...
-[PASS] Ignore 'Yeah'
-[PASS] Interrupt on 'Stop'
-...
-All tests passed!
-```
+### 2. Rigorous Logic Audit (54 Scenarios)
+We have generated a massive validation log testing **54 edge cases**, including mixed punctuation, case sensitivity, and complex sentences.
+*   **Run Audit:** `python generate_proof_log.py`
+*   **View Proof:** [comprehensive_test_log.txt](comprehensive_test_log.txt)
 
-## 📂 Key Files Modified
+## 📂 Key Files
+*   `livekit/agents/voice/interruption_logic.py`: **The Brain** (Pure logic).
+*   `livekit/agents/voice/agent_activity.py`: **The Integration** (VAD disable + STT Hook).
+*   `demo_simulation.py`: **The Demo** (CLI Simulation).
+*   `comprehensive_test_log.txt`: **The Proof** (Validation Log).
 
-*   `livekit/agents/voice/interruption_logic.py`: Core logic for text analysis.
-*   `livekit/agents/voice/agent_activity.py`: Integration into the event loop.
-*   `tests/test_interruption_logic.py`: Unit tests.
+## 🧠 Core Logic Explained
+The system enables a **Start-of-Turn State Check**:
+1.  **If Agent is SPEAKING**: "Yeah" -> **IGNORE** (Backchannel).
+2.  **If Agent is SILENT**: "Yeah" -> **PROCESS** (User Answer).
 
----
-(Original README follows below)
+This ensures the user can say "Yeah" to confirm listening (ignored) OR "Yeah" to answer a question (processed).
+
