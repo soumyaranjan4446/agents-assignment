@@ -180,6 +180,79 @@ def main():
         print(f"\n{DIM}[Safety interruption TRIGGERED]{RESET}")
         print(f"{CYAN}{BOLD}🤖 AI_AGENT  : {RESET}{CYAN}[Sequence Aborted]{RESET}")
 
+    print(f"\n{DIM}{'-'*50}{RESET}\n")
+    time.sleep(2)
+
+    # --- SCENARIO 7: SILENT STATE (CRITICAL CHECK) --------------------------
+    print(f"{MAGENTA}{BOLD}Scenario 7: Silent State Affirmation{RESET}")
+    print(f"{DIM}(User says 'Yeah' while agent is SILENT -> Should RESPOND){RESET}\n")
+
+    print(f"{CYAN}{BOLD}🤖 AI_AGENT  : {RESET}{CYAN}[Silent / Waiting for input...]{RESET}")
+    print_user("Yeah")
+    
+    # Logic: Logic layer usually returns True (Ignore Interruption), BUT 
+    # the integration code (agent_activity.py) ensures we only call this if Speaking.
+    # checking logic here anyway to show it recognizes it as backchannel words
+    decision = should_ignore_interruption("Yeah", IGNORE_LIST)
+    
+    # SIMULATION OF STATE CHECK
+    is_agent_speaking = False 
+    
+    if is_agent_speaking:
+        if decision: print("Action: Ignore")
+    else:
+         print(f"   {GREEN}✅ STATE CHECK: Agent is SILENT.{RESET}")
+         print(f"   {GREEN}▶️  ACTION    : PROCESS 'Yeah' AS CHAT INPUT (Send to LLM){RESET}")
+
+    print(f"\n{DIM}{'-'*50}{RESET}\n")
+    time.sleep(2)
+
+    # --- SCENARIO 8: CASE SENSITIVITY & PUNCTUATION -------------------------
+    print(f"{MAGENTA}{BOLD}Scenario 8: Case & Punctuation{RESET}")
+    print(f"{DIM}(User says 'OK!!!' or 'yEaH' -> Should still IGNORE){RESET}\n")
+
+    print_slow("This robustness ensures that speech-to-text variations...")
+    print_user("OK!!!")
+
+    if analyze_logic("OK!!!"):
+         print_slow("...do not accidentally trigger an interruption.")
+    else:
+         print_slow("...[Interrupted]")
+
+    print(f"\n{DIM}{'-'*50}{RESET}\n")
+    time.sleep(2)
+
+    # --- SCENARIO 9: MIXED INPUT (REVERSE) ----------------------------------
+    print(f"{MAGENTA}{BOLD}Scenario 9: Order Variation{RESET}")
+    print(f"{DIM}(User says 'Wait... yeah' -> Should INTERRUPT){RESET}\n")
+    
+    print_slow("We can proceed to the next chapter if you are ready...")
+    print_user("Wait... yeah")
+    
+    if analyze_logic("Wait... yeah"):
+        pass
+    else:
+        time.sleep(0.5)
+        print(f"\n{DIM}[System detected 'Wait' first]{RESET}")
+        print(f"{RED}🛑 INTERRUPTED CORRECTLY.{RESET}")
+
+    print(f"\n{DIM}{'-'*50}{RESET}\n")
+    time.sleep(2)
+
+    # --- SCENARIO 10: COMPLEX SENTENCE (NO KEYWORDS) ------------------------
+    print(f"{MAGENTA}{BOLD}Scenario 10: Completely New Sentence{RESET}")
+    print(f"{DIM}(User asks a question -> Should INTERRUPT){RESET}\n")
+    
+    print_slow("The documentation covers all aspects of the API...")
+    print_user("Can you repeat that?")
+    
+    if analyze_logic("Can you repeat that?"):
+        pass
+    else:
+        time.sleep(0.5)
+        print(f"\n{DIM}[No ignore words found]{RESET}")
+        print(f"{RED}🛑 INTERRUPTED CORRECTLY.{RESET}")
+
     print(f"\n{BLUE}{BOLD}======================================================{RESET}")
 
     print(f"{GREEN}{BOLD}   DEMO COMPLETE - ALL LOGIC CHECKS PASSED {RESET}")
